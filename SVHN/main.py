@@ -58,6 +58,8 @@ def main():
     # Limited data for fast testing
     #num_train_imgs = 5000
     #num_val_imgs = 1000
+
+    # remove data for uniform batch sizes
     ignore = len(ds) - (num_train_imgs + num_val_imgs)
     
     
