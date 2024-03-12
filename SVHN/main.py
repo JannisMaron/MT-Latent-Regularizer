@@ -55,10 +55,9 @@ def main():
        download = True,            
     ) 
     
-    #ds = datasets.ImageFolder("C:\\MT\\Datasets\\Custom SVHN\\train", transform=transform)
-    
-    num_train_imgs = 5000
-    num_val_imgs = 1000
+    # Limited data for fast testing
+    #num_train_imgs = 5000
+    #num_val_imgs = 1000
     ignore = len(ds) - (num_train_imgs + num_val_imgs)
     
     
@@ -129,11 +128,11 @@ if __name__ == "__main__":
     lr = config.getfloat(regularizer, "lr") 
 
 
-    
-    
-    # Data location
-    date = "mar_2_"
+    # Dataset Location  NEED TO CHANGE
     data_dir = "C:/MT/Datasets/"
+
+    # Save location
+    date = "mar_2_"
     file_path =  'models/' + regularizer + "/" + date + experiment + "/Temp"
     
     print()

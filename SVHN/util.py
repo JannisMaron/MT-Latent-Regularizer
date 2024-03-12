@@ -13,7 +13,7 @@ import regularizer
 ###############################################################################
 
 def craft_FGSM_adv_samples(model, x, y, epsilon, alpha):
- 
+    '''Craft Latent FGSM'''
     
     # Normal images' latent
     _, input_latent_z = model(x)
@@ -41,8 +41,8 @@ def craft_FGSM_adv_samples(model, x, y, epsilon, alpha):
 
 
 def craft_output_FGSM_adv_samples(model, x, y, epsilon, alpha):
- 
-    # FGSM attack to create adversarial samples based on latent loss
+    '''Craft Classification FGSM'''
+
     delta = torch.zeros_like(x).uniform_(-epsilon, epsilon).cuda()
     delta.requires_grad = True
     
@@ -66,6 +66,7 @@ def craft_output_FGSM_adv_samples(model, x, y, epsilon, alpha):
 
 
 def craft_PGD_adv_samples(model, x, y, epsilon, alpha, iterations = 10):
+    '''Craft Latent PGD'''
 
     x = x.clone().detach()
     
@@ -99,6 +100,7 @@ def craft_PGD_adv_samples(model, x, y, epsilon, alpha, iterations = 10):
 
 
 def craft_output_PGD_adv_samples(model, x, y, epsilon, alpha, iterations = 10):
+    '''Craft Classification PGD'''
 
     x = x.clone().detach()
 

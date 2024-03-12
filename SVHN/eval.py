@@ -53,36 +53,23 @@ def evaluate(model, data, report):
     
     epsilons = np.array([6, 8, 10, 12, 16]) / 255
     alphas = 1.25 * epsilons
-    #eval_tests.fgsm_robustness(model, data, True, epsilons, alphas)
+    eval_tests.fgsm_robustness(model, data, True, epsilons, alphas)
     
     epsilons = np.array([6, 8, 10, 12, 16]) / 255
     alphas = 1.25 * epsilons
-    #eval_tests.fgsm_robustness(model, data, False, epsilons, alphas)
-    
-    
-    epsilons =np.array([6, 8, 10, 12, 16]) / 255
-    alphas = 2/255 * np.ones_like(epsilons)
-    #eval_tests.pgd_robustness(model, data, True, epsilons, alphas, 10)
+    eval_tests.fgsm_robustness(model, data, False, epsilons, alphas)
     
     
     epsilons = np.array([6, 8, 10, 12, 16]) / 255
     alphas = 2/255 * np.ones_like(epsilons)
-    #eval_tests.pgd_robustness(model, data, False, epsilons, alphas, 10)
+    eval_tests.pgd_robustness(model, data, True, epsilons, alphas, 10)
     
-    #A = np.random.randint(0, 255, size = (1,3,32,32), dtype=np.uint8)
-    #A = torch.Tensor(A).cuda()
     
-    #B = np.random.randn(1,3,32,32)
-    #B = torch.Tensor(B).cuda()
+    epsilons = np.array([6, 8, 10, 12, 16]) / 255
+    alphas = 2/255 * np.ones_like(epsilons)
+    eval_tests.pgd_robustness(model, data, False, epsilons, alphas, 10)
     
-    #imgs, label = next(iter(data))
-    #img = imgs[0].unsqueeze(0).cuda()
-    #print(imgs.shape)
-    #print(img.shape)
-    
-    #print(model(A)[0])
-    #print(model(B)[0])
-    #print(model(img)[0])
+ 
 
 def main():
     
@@ -128,7 +115,8 @@ if __name__ == "__main__":
     # train settings
     batch_size = config.getint(experiment, "batch_size")    
     
-    # adversarial example settings
+    # adversarial example settings 
+    # currently overwritten for simpler testing
     epsilon = config.getfloat(experiment, "epsilon") / 255
     alpha = config.getfloat(experiment, "alpha") / 255
     
@@ -145,11 +133,12 @@ if __name__ == "__main__":
     regularizer = config.get("Regularizer", "regularizer")
 
 
+    # Dataset Location # Need to change
+    data_dir = "C:/MT/Datasets/"
 
     # Data location
-    date = "mar_1_"
+    date = "mar_2_"
     file_name = "/last.pth"
-    data_dir = "C:/MT/Datasets/"
     file_path =  'models/' + regularizer + "/" + date + experiment + "/class_pgd-5/Ex1"
     
     print(file_path)

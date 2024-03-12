@@ -26,6 +26,81 @@ def no_reg_loss(pred, adv_pred, label, z, adv_z, weights,
     return loss_mean, weighted_partial_losses
 
 
+def classic_loss(pred, adv_pred, label, z, adv_z, weights,
+               gmm_centers, gmm_std, coup):
+    
+    clean_weight = weights[0]
+    adv_weight = weights[1]
+    
+    clean_loss = F.cross_entropy(pred, label)
+    adv_loss = F.cross_entropy(adv_pred, label)
+    
+    clean_loss = clean_weight * clean_loss
+    adv_loss = adv_weight * adv_loss
+    
+    
+    loss = 0
+    loss += clean_loss
+    loss += adv_loss
+    loss = loss.cuda()
+    
+    partial_losses = []
+    partial_losses.append(clean_loss.item())
+    partial_losses.append(adv_loss.item())
+    partial_losses = np.array(partial_losses)
+    
+    return loss, partial_losses
+
+
+def inverse_latent_supervised_loss(pred, adv_pred, label, z, z_adv, weights, gmm_centers, gmm_std, coup):
+    
+    clean_pred_weight = weights[0]
+    adv_pred_weight = weights[1]
+    supervised_ks_weight = weights[2]
+    ks_pair_weight = weights [3]
+    cv_weight = weights[4]
+    
+    
+    clean_pred = F.cross_entropy(pred, label)
+    adv_pred_loss = F.cross_entropy(adv_pred, label)
+    supervised_ks = regularizer.inverse_supervised_ks_loss(z, z_adv, label, gmm_centers, gmm_std)
+    ks_pair = regularizer.ks_pair_loss(z, z_adv, gmm_centers, gmm_std)
+    cv = regularizer.covariance_loss(z, z_adv, gmm_centers, gmm_std, coup)
+    
+    
+    clean_pred_loss = clean_pred_weight * clean_pred
+    adv_pred_loss = adv_pred_weight * adv_pred_loss 
+    supervised_ks_loss = supervised_ks_weight * supervised_ks
+    ks_pair_loss = ks_pair_weight * ks_pair
+    cv_loss = cv_weight * cv
+    
+    total_loss = 0
+    total_loss += clean_pred_loss 
+    total_loss += adv_pred_loss
+    total_loss += supervised_ks_loss 
+    total_loss += ks_pair_loss
+    total_loss += cv_loss
+    total_loss = total_loss.mean().cuda()
+    
+    partial_losses = []
+    partial_losses.append(clean_pred_loss.item())
+    partial_losses.append(adv_pred_loss.item())
+    partial_losses.append(supervised_ks_loss.item())
+    partial_losses.append(ks_pair_loss.item())
+    partial_losses.append(cv_loss.item())
+    partial_losses = np.array(partial_losses)
+        
+    
+    return total_loss, partial_losses   
+
+
+
+
+
+
+
+
+
 def latent_loss(pred, adv_pred, label, z, adv_z, weights,
                gmm_centers, gmm_std, coup):
     
@@ -85,31 +160,7 @@ def classic_loss_(pred, adv_pred, label, z, adv_z, weights,
                                        
      return loss_mean, weighted_partial_losses
  
-    
-def classic_loss(pred, adv_pred, label, z, adv_z, weights,
-               gmm_centers, gmm_std, coup):
-    
-    clean_weight = weights[0]
-    adv_weight = weights[1]
-    
-    clean_loss = F.cross_entropy(pred, label)
-    adv_loss = F.cross_entropy(adv_pred, label)
-    
-    clean_loss = clean_weight * clean_loss
-    adv_loss = adv_weight * adv_loss
-    
-    
-    loss = 0
-    loss += clean_loss
-    loss += adv_loss
-    loss = loss.cuda()
-    
-    partial_losses = []
-    partial_losses.append(clean_loss.item())
-    partial_losses.append(adv_loss.item())
-    partial_losses = np.array(partial_losses)
-    
-    return loss, partial_losses
+  
  
     
 
@@ -197,43 +248,3 @@ def latent_supervised_loss(pred, adv_pred, label, z, z_adv, weights, gmm_centers
     
     return total_loss, partial_losses   
 
-def inverse_latent_supervised_loss(pred, adv_pred, label, z, z_adv, weights, gmm_centers, gmm_std, coup):
-    
-    clean_pred_weight = weights[0]
-    adv_pred_weight = weights[1]
-    supervised_ks_weight = weights[2]
-    ks_pair_weight = weights [3]
-    cv_weight = weights[4]
-    
-    
-    clean_pred = F.cross_entropy(pred, label)
-    adv_pred_loss = F.cross_entropy(adv_pred, label)
-    supervised_ks = regularizer.inverse_supervised_ks_loss(z, z_adv, label, gmm_centers, gmm_std)
-    ks_pair = regularizer.ks_pair_loss(z, z_adv, gmm_centers, gmm_std)
-    cv = regularizer.covariance_loss(z, z_adv, gmm_centers, gmm_std, coup)
-    
-    
-    clean_pred_loss = clean_pred_weight * clean_pred
-    adv_pred_loss = adv_pred_weight * adv_pred_loss 
-    supervised_ks_loss = supervised_ks_weight * supervised_ks
-    ks_pair_loss = ks_pair_weight * ks_pair
-    cv_loss = cv_weight * cv
-    
-    total_loss = 0
-    total_loss += clean_pred_loss 
-    total_loss += adv_pred_loss
-    total_loss += supervised_ks_loss 
-    total_loss += ks_pair_loss
-    total_loss += cv_loss
-    total_loss = total_loss.mean().cuda()
-    
-    partial_losses = []
-    partial_losses.append(clean_pred_loss.item())
-    partial_losses.append(adv_pred_loss.item())
-    partial_losses.append(supervised_ks_loss.item())
-    partial_losses.append(ks_pair_loss.item())
-    partial_losses.append(cv_loss.item())
-    partial_losses = np.array(partial_losses)
-        
-    
-    return total_loss, partial_losses   

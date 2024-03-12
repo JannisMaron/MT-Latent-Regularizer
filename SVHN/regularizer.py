@@ -4,16 +4,6 @@ from torch.nn import functional as F
 import torch.nn as nn
 
 
-class L4_Loss(nn.Module):
-    def __init__(self):
-        super(L4_Loss, self).__init__()
-        
-    def forward(self, x, y):
-        loss = torch.mean(torch.pow(x-y,4))
-        return loss
-
-
-
 
 ###############################################################################
 # Regularizer
@@ -53,7 +43,7 @@ def compute_empirical_covariance(embedding_matrix):
 
 
 
-
+### Not used currently
 def ks_loss(embedding_matrix, adv_embedding_matrix, gmm_centers, gmm_std):
 
     total_embedding = torch.cat((embedding_matrix, adv_embedding_matrix), dim=0)
@@ -126,6 +116,7 @@ def covariance_loss(embedding_matrix, adv_embedding_matrix, gmm_centers, gmm_std
 ###############################################################################
 # Supervised Losses
 ###############################################################################
+### Not used currently
 def supervised_ks_loss(embedding_matrix, adv_embedding_matrix, labels, gmm_centers, gmm_std, num_classes = 10):
     
     loss = 0
@@ -212,32 +203,3 @@ def inverse_supervised_ks_loss(embedding_matrix, adv_embedding_matrix, labels, g
     
     return loss
 
-def supervised_ks_pair_loss(embedding_matrix, adv_embedding_matrix, labels, gmm_centers, gmm_std, num_classes = 10):
-    
-    loss = 0
-    
-    for i in range(num_classes):
-        
-        mean_vec = gmm_centers[i]
-        class_embeddings = embedding_matrix[labels == i]
-        adv_class_embeddings = adv_embedding_matrix[labels == i]
-        
-        if len(class_embeddings) == 0 or len(adv_embedding_matrix) == 0:
-            continue
-        
-        sorted_embeddings = torch.sort(class_embeddings, dim=-2).values
-        sorted_advembeddings = torch.sort(adv_class_embeddings, dim=-2).values
-        
-        
-        normalized_embeddings = (sorted_embeddings[:, None] - mean_vec[None]) / gmm_std
-        normal_cdf = 0.5 * (1 + torch.erf(normalized_embeddings * 0.70710678118))
-        normal_cdf = normal_cdf.mean(dim=1)
-
-        normalized_advembedding = (sorted_advembeddings[:, None] - mean_vec[None]) / gmm_std
-        normal_advcdf = 0.5 * (1 + torch.erf(normalized_advembedding * 0.70710678118))
-        normal_advcdf = normal_advcdf.mean(dim=1)
-        
-        loss += torch.nn.functional.mse_loss(normal_cdf, normal_advcdf)
-                
-        
-    return loss

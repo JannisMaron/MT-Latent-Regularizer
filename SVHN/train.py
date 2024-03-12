@@ -11,7 +11,6 @@ import load_save
 
 device = util.get_default_device()
 
-train_method = "standart"
 
 
 
@@ -20,8 +19,6 @@ def fit(n_epochs, model, optimizer, train_dl, val_dl, loss_fn,
         epsilon, alpha, gmm_centers, gmm_std, weights, coup,
         file_path):
     
-    #lambda_lr = lambda epoch: 0.9 ** (epoch // 5)
-    #scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda_lr)
     
     print("Start Training:", datetime.datetime.now().strftime("%X"))
     
@@ -59,12 +56,11 @@ def fit(n_epochs, model, optimizer, train_dl, val_dl, loss_fn,
     for epoch in range(n_epochs):
      
         # Training
+
         
-        if train_method == "standart":
-        
-            train_loss, train_partial_loss =\
-                    train(model, optimizer, train_dl, loss_fn, epsilon, alpha, 
-                          gmm_centers, gmm_std, weights, coup)
+        train_loss, train_partial_loss =\
+                train(model, optimizer, train_dl, loss_fn, epsilon, alpha, 
+                        gmm_centers, gmm_std, weights, coup)
                     
                     
                     
@@ -84,7 +80,7 @@ def fit(n_epochs, model, optimizer, train_dl, val_dl, loss_fn,
         
         
         # Stats every 10th epoch
-        if epoch % 1 == 0:
+        if epoch % 10 == 0:
             print('\n------------------------------')
             print('Time:', datetime.datetime.now().strftime("%X"))
             print("Currend Epoch: ", epoch)
@@ -111,7 +107,7 @@ def fit(n_epochs, model, optimizer, train_dl, val_dl, loss_fn,
                        vl, vl_partial, accuracy,
                        file_path, "/last.pth")
         
-        #scheduler.step() 
+
         #break          
                     
                     
@@ -139,7 +135,6 @@ def train(model, optimizer, train_dl, loss_fn,
         #adv_x = util.craft_PGD_adv_samples(model, x, label, 8/255, 2/255, 5)
         adv_x = util.craft_output_PGD_adv_samples(model, x, label, 8/255, 2/255, 5)
 
-        optimizer.zero_grad()
         
         # Clean Images
         pred, z = model(x) 
@@ -157,6 +152,7 @@ def train(model, optimizer, train_dl, loss_fn,
         optimizer.zero_grad()
         loss.backward()   
         
+        # Checking for vanishing Gradients
         #print()
         #print("----------------------")
         #print("Batch: ", i)
