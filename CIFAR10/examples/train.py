@@ -237,7 +237,7 @@ class Main:
 
         state = None
         start_epoch = 0
-        self.epochs = 3
+        self.epochs = 150
         
 
 
@@ -309,8 +309,8 @@ class Main:
         # Regularizer
         #######################################################################
         
-        train = False
-        logging = False
+        train = True
+        logging = True
         
         train_progress_file = self.args.directory + "/train_progress_file.pth"
         train_info_file = self.args.directory + "/train_info.pth"
